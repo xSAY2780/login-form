@@ -1,8 +1,8 @@
 from tkinter import *
 import sqlite3
 
-def registerclicked(main_window):
-    main_window.destroy()
+def registerclicked():
+    windowlogin.destroy()
     
     def registerusr(username, password):
         if textnpass.get() == textnpassc.get() and textnpass.get() != "" and textnusrnm.get() != "":
@@ -23,35 +23,37 @@ def registerclicked(main_window):
         elif textnusrnm.get() != "":
             lblregister.configure(text="Please Enter Pass")
     
-    window = Tk()
-    window.geometry('400x300')
-    window.title("Register")
+    global windowregister
 
-    lblnusrnm = Label(window, text="New Username: ")
+    windowregister = Tk()
+    windowregister.geometry('400x300')
+    windowregister.title("Register")
+
+    lblnusrnm = Label(windowregister, text="New Username: ")
     lblnusrnm.place(x=150, y=40)
 
-    lblnpass = Label(window, text="New Password: ")
+    lblnpass = Label(windowregister, text="New Password: ")
     lblnpass.place(x=150, y=90)
 
-    lblnpassc = Label(window, text="Confirm Password: ")
+    lblnpassc = Label(windowregister, text="Confirm Password: ")
     lblnpassc.place(x=142, y=140)
 
-    lblregister = Label(window, text="Please Register")
+    lblregister = Label(windowregister, text="Please Register")
     lblregister.place(x=150, y=10)
 
-    textnusrnm = Entry(window, width=10)
+    textnusrnm = Entry(windowregister, width=10)
     textnusrnm.place(x=150, y=60)
 
-    textnpass = Entry(window, width=10, show='*')
+    textnpass = Entry(windowregister, width=10, show='*')
     textnpass.place(x=150, y=110)
 
-    textnpassc = Entry(window, width=10, show='*')
+    textnpassc = Entry(windowregister, width=10, show='*')
     textnpassc.place(x=150, y=160)
 
-    btnregistern = Button(window, text="Register", command=lambda: registerusr(textnusrnm.get(), textnpass.get()))
+    btnregistern = Button(windowregister, text="Register", command=lambda: registerusr(textnusrnm.get(), textnpass.get()))
     btnregistern.place(x=157, y=190)
 
-    btnrlogin = Button(window, text="Login", command=lambda: [window.destroy(), login_window()])
+    btnrlogin = Button(windowregister, text="Login", command=lambda: [windowregister.destroy(), login_window()])
     btnrlogin.place(x=165, y=220)
 
 def setup_db():
@@ -67,23 +69,26 @@ def setup_db():
 
 #Main Login Window
 def login_window():
-    window = Tk()
-    window.geometry('400x300')
-    window.title("Login")
 
-    lblusrnm = Label(window, text="Username: ")
+    global windowlogin
+
+    windowlogin = Tk()
+    windowlogin.geometry('400x300')
+    windowlogin.title("Login")
+
+    lblusrnm = Label(windowlogin, text="Username: ")
     lblusrnm.place(x=165, y=40)
 
-    lblpass = Label(window, text="Password: ")
+    lblpass = Label(windowlogin, text="Password: ")
     lblpass.place(x=165, y=90)
 
-    lbldef = Label(window, text="Please Login")
+    lbldef = Label(windowlogin, text="Please Login")
     lbldef.place(x=160, y=10)
 
-    textusrnm = Entry(window,width=10)
+    textusrnm = Entry(windowlogin,width=10)
     textusrnm.place(x=150, y=60)
 
-    textpass = Entry(window,width=10, show='*')
+    textpass = Entry(windowlogin,width=10, show='*')
     textpass.place(x=150, y=110)
 
     def loginlicked():
@@ -97,32 +102,35 @@ def login_window():
         conn.close()
 
         if user:
+            windowlogin.destroy()
             conn = sqlite3.connect('users.db')
             cursor = conn.cursor()
             cursor.execute("SELECT id FROM users WHERE username=? AND password=?", (username, password))
             uid = cursor.fetchone()[0]
-            conn.close() 
+            conn.close()
 
-            window = Tk()
-            window.geometry('400x300')
-            window.title("What Is My User Id")
+            global windowmain
 
-            lbluid = Label(window, text="")
-            lbluid.place(x=148, y=145)
+            windowmain = Tk()
+            windowmain.geometry('400x300')
+            windowmain.title("What Is My User Id")
 
-            btnusrid = Button(window, text="What Is My UserID", command=lambda: lbluid.configure(text=f"Your UserID Is {uid}"))
+            lbluid = Label(windowmain, text="")
+            lbluid.place(x=14, y=145)
+
+            btnusrid = Button(windowmain, text="What Is My UserID", command=lambda: lbluid.configure(text=f"Your UserID Is {uid}"))
             btnusrid.place(x=125, y=115)
                 
         else:
             lbldef.configure(text="User Not Found")
 
-    btnlogin = Button(window, text="Login", command=loginlicked)
+    btnlogin = Button(windowlogin, text="Login", command=loginlicked)
     btnlogin.place(x=125, y=140)
 
-    btnregister = Button(window, text="Register", command=lambda: registerclicked(window))
+    btnregister = Button(windowlogin, text="Register", command=lambda: registerclicked())
     btnregister.place(x=195, y=140)
 
-    window.mainloop()
+    windowlogin.mainloop()
 
 
 setup_db()
