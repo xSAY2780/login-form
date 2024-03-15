@@ -97,7 +97,22 @@ def login_window():
         conn.close()
 
         if user:
-            lbldef.configure(text="Login Success")
+            conn = sqlite3.connect('users.db')
+            cursor = conn.cursor()
+            cursor.execute("SELECT id FROM users WHERE username=? AND password=?", (username, password))
+            uid = cursor.fetchone()[0]
+            conn.close() 
+
+            window = Tk()
+            window.geometry('400x300')
+            window.title("What Is My User Id")
+
+            lbluid = Label(window, text="")
+            lbluid.place(x=148, y=145)
+
+            btnusrid = Button(window, text="What Is My UserID", command=lambda: lbluid.configure(text=f"Your UserID Is {uid}"))
+            btnusrid.place(x=125, y=115)
+                
         else:
             lbldef.configure(text="User Not Found")
 
@@ -109,4 +124,6 @@ def login_window():
 
     window.mainloop()
 
+
+setup_db()
 login_window()
