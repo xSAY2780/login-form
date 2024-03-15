@@ -16,7 +16,7 @@ def registerclicked(main_window):
             lblregister.configure(text="Please Enter Username")
         elif textnpass.get() != "" and textnusrnm.get() == "":
             lblregister.configure(text="Please Enter Username")
-        elif textnusrnm.get() != "" and textnpass.get() == "" and textnpassc.get() == "":
+        elif textnusrnm.get() != "" and textnpass.get() != "" and textnpassc.get() == "":
             lblregister.configure(text="Please Confirm Pass")
         elif textnpassc.get() != textnpass.get():
             lblregister.configure(text="Pass Do Not Match")
