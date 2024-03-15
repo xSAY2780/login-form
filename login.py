@@ -1,6 +1,5 @@
 from tkinter import *
 import sqlite3
-import time
 
 def registerclicked():
     window = Tk()
@@ -29,15 +28,23 @@ def registerclicked():
     textnpassc.place(x=150, y=160)
 
     def registerusr(username, password):
-        if textnpass.get() == textnpassc.get():
+        if textnpass.get() == textnpassc.get and textnpass.get() != "" and textnusrnm.get() != "":
             conn = sqlite3.connect('users.db')
             c = conn.cursor()
             c.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
             conn.commit()
             conn.close()
             lblregister.configure(text="Register Succses")
-        else:
+        elif textnpass.get() != "" and textnpassc.get() != "" and textnusrnm.get() == "":
+            lblregister.configure(text="Please Enter Username")
+        elif textnpass.get() != "" and textnusrnm == "":
+            lblregister.configure(text="Please Enter Username")
+        elif textnusrnm.get() != "" and textnpass.get() != "" and textnpassc.get() == "":
+            lblregister.configure(text="Please Confirm Pass")
+        elif textnpassc.get() != textnpass.get():
             lblregister.configure(text="Pass Do Not Match")
+        elif textnusrnm.get() != "":
+            lblregister.configure(text="Please Enter Pass")
 
     btnregistern = Button(window, text="Register", command=lambda: registerusr(textnusrnm.get(), textnpass.get()))
     btnregistern.place(x=157, y=190)
