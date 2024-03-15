@@ -1,7 +1,28 @@
 from tkinter import *
 import sqlite3
 
-def registerclicked():
+def registerclicked(main_window):
+    main_window.destroy()
+    
+    def registerusr(username, password):
+        if textnpass.get() == textnpassc.get() and textnpass.get() != "" and textnusrnm.get() != "":
+            conn = sqlite3.connect('users.db')
+            c = conn.cursor()
+            c.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
+            conn.commit()
+            conn.close()
+            lblregister.configure(text="Register Success")
+        elif textnpass.get() != "" and textnpassc.get() != "" and textnusrnm.get() == "":
+            lblregister.configure(text="Please Enter Username")
+        elif textnpass.get() != "" and textnusrnm.get() == "":
+            lblregister.configure(text="Please Enter Username")
+        elif textnusrnm.get() != "" and textnpass.get() == "" and textnpassc.get() == "":
+            lblregister.configure(text="Please Confirm Pass")
+        elif textnpassc.get() != textnpass.get():
+            lblregister.configure(text="Pass Do Not Match")
+        elif textnusrnm.get() != "":
+            lblregister.configure(text="Please Enter Pass")
+    
     window = Tk()
     window.geometry('400x300')
     window.title("Register")
@@ -27,78 +48,65 @@ def registerclicked():
     textnpassc = Entry(window, width=10, show='*')
     textnpassc.place(x=150, y=160)
 
-    def registerusr(username, password):
-        if textnpass.get() == textnpassc.get and textnpass.get() != "" and textnusrnm.get() != "":
-            conn = sqlite3.connect('users.db')
-            c = conn.cursor()
-            c.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
-            conn.commit()
-            conn.close()
-            lblregister.configure(text="Register Succses")
-        elif textnpass.get() != "" and textnpassc.get() != "" and textnusrnm.get() == "":
-            lblregister.configure(text="Please Enter Username")
-        elif textnpass.get() != "" and textnusrnm == "":
-            lblregister.configure(text="Please Enter Username")
-        elif textnusrnm.get() != "" and textnpass.get() != "" and textnpassc.get() == "":
-            lblregister.configure(text="Please Confirm Pass")
-        elif textnpassc.get() != textnpass.get():
-            lblregister.configure(text="Pass Do Not Match")
-        elif textnusrnm.get() != "":
-            lblregister.configure(text="Please Enter Pass")
-
     btnregistern = Button(window, text="Register", command=lambda: registerusr(textnusrnm.get(), textnpass.get()))
     btnregistern.place(x=157, y=190)
 
-conn = sqlite3.connect('users.db')
-c = conn.cursor()
-c.execute('''CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY,
-    username TEXT NOT NULL,
-    password TEXT NOT NULL
-)
-''')
-conn.commit()
-conn.close()
+    btnrlogin = Button(window, text="Login", command=lambda: [window.destroy(), login_window()])
+    btnrlogin.place(x=165, y=220)
 
-window = Tk()
-window.geometry('400x300')
-window.title("Login")
-
-lblusrnm = Label(window, text="Username: ")
-lblusrnm.place(x=165, y=40)
-
-lblpass = Label(window, text="Password: ")
-lblpass.place(x=165, y=90)
-
-lbldef = Label(window, text="Please Login")
-lbldef.place(x=160, y=10)
-
-textusrnm = Entry(window,width=10)
-textusrnm.place(x=150, y=60)
-
-textpass = Entry(window,width=10, show='*')
-textpass.place(x=150, y=110)
-
-def loginlicked():
-    username = textusrnm.get()
-    password = textpass.get()
-
+def setup_db():
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
-    c.execute("SELECT * FROM users WHERE username=? AND password=?", (username, password))
-    user = c.fetchone()
+    c.execute('''CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY,
+        username TEXT NOT NULL,
+        password TEXT NOT NULL
+    )''')
+    conn.commit()
     conn.close()
 
-    if user:
-        lbldef.configure(text="Login Succes")
-    else:
-        lbldef.configure(text="User Do Not Found")
+#Main Login Window
+def login_window():
+    window = Tk()
+    window.geometry('400x300')
+    window.title("Login")
 
+    lblusrnm = Label(window, text="Username: ")
+    lblusrnm.place(x=165, y=40)
 
-btnlogin = Button(window, text="Login", command=loginlicked)
-btnlogin.place(x=125, y=140)
+    lblpass = Label(window, text="Password: ")
+    lblpass.place(x=165, y=90)
 
-btnregister = Button(window, text="Register", command=registerclicked)
-btnregister.place(x=195, y=140)
+    lbldef = Label(window, text="Please Login")
+    lbldef.place(x=160, y=10)
 
-window.mainloop()
+    textusrnm = Entry(window,width=10)
+    textusrnm.place(x=150, y=60)
+
+    textpass = Entry(window,width=10, show='*')
+    textpass.place(x=150, y=110)
+
+    def loginlicked():
+        username = textusrnm.get()
+        password = textpass.get()
+
+        conn = sqlite3.connect('users.db')
+        c = conn.cursor()
+        c.execute("SELECT * FROM users WHERE username=? AND password=?", (username, password))
+        user = c.fetchone()
+        conn.close()
+
+        if user:
+            lbldef.configure(text="Login Success")
+        else:
+            lbldef.configure(text="User Not Found")
+
+    btnlogin = Button(window, text="Login", command=loginlicked)
+    btnlogin.place(x=125, y=140)
+
+    btnregister = Button(window, text="Register", command=lambda: registerclicked(window))
+    btnregister.place(x=195, y=140)
+
+    window.mainloop()
+
+login_window()
